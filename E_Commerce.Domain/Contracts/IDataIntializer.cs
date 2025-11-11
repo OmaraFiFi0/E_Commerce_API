@@ -8,6 +8,6 @@ namespace E_Commerce.Domain.Contracts
 {
     public interface IDataIntializer
     {
-        void initialize();
+        Task initializeAsync();
     }
 }

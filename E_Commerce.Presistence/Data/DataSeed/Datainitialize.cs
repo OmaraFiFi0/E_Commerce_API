@@ -20,32 +20,33 @@ namespace E_Commerce.Presistence.Data.DataSeed
         {
             _dbContext = dbContext;
         }
-        public void initialize()
+        public async Task initializeAsync()
         {
             try
             {
-                var HasProduct = _dbContext.Products.Any();
-                var HasBrands = _dbContext.ProductBrands.Any();
-                var HasTypes = _dbContext.ProductTypes.Any();
+                // DataBase Hits
+                var HasProduct = await _dbContext.Products.AnyAsync();
+                var HasBrands = await _dbContext.ProductBrands.AnyAsync();
+                var HasTypes = await _dbContext.ProductTypes.AnyAsync();
 
                 if (HasProduct && HasBrands && HasTypes) return;
 
                 if (!HasBrands)
                 {
-                    SeedDataFromJson<ProductBrand,int>("brands.json",_dbContext.ProductBrands); // Save Local
+                   await SeedDataFromJson<ProductBrand,int>("brands.json",_dbContext.ProductBrands); // Save Local
                 }
 
                 if (!HasTypes)
                 {
-                    SeedDataFromJson<ProductType,int>("types.json",_dbContext.ProductTypes); // Save Local
+                   await SeedDataFromJson<ProductType,int>("types.json",_dbContext.ProductTypes); // Save Local
                 }
-                _dbContext.SaveChanges(); // 1st DataBase Hit
+                await _dbContext.SaveChangesAsync(); // 1st DataBase Hit
 
                 if (!HasProduct)
                 {
-                     SeedDataFromJson<Product,int>("products.json",_dbContext.Products); // Save Changes
+                     await SeedDataFromJson<Product,int>("products.json",_dbContext.Products); // Save Local
                 }
-                _dbContext.SaveChanges(); // 2nd DataBase Hit
+                await _dbContext.SaveChangesAsync(); // 2nd DataBase Hit
             }
             catch (Exception ex)
             {
@@ -55,7 +56,7 @@ namespace E_Commerce.Presistence.Data.DataSeed
 
         }
 
-        private void SeedDataFromJson<T,TKey>(string FileName , DbSet<T> dbset) where T :BaseEntity<TKey>,new() 
+        private async Task SeedDataFromJson<T,TKey>(string FileName , DbSet<T> dbset) where T :BaseEntity<TKey>,new() 
         {
             //H:\Route C44\Back End\Eng Khalid Ahmed\ECommerce_Project\ECommerce\E_Commerce.Presistence\Data\DataSeed\JsonFiles\products.json
             // E_Commerce.Presistence\Data\DataSeed\JsonFiles\products.json
@@ -68,18 +69,17 @@ namespace E_Commerce.Presistence.Data.DataSeed
 
             try
             {
-                // When You Wnat To Using Stream
-                File.ReadAllText(FilePath);
+                // When You Wnat To Using Stream 
                 var DataStram = File.OpenRead(FilePath);
 
-                var data = JsonSerializer.Deserialize<List<T>>(DataStram,new JsonSerializerOptions
+                var data = await JsonSerializer.DeserializeAsync<List<T>>(DataStram,new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true
                 });
 
                 if(data is not null )
                 {
-                    dbset.AddRange(data);
+                  await  dbset.AddRangeAsync(data);
                 }
             }
             catch (Exception ex)

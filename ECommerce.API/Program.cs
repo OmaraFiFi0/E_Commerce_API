@@ -1,15 +1,16 @@
-
+ 
 using E_Commerce.Domain.Contracts;
 using E_Commerce.Presistence.Data.DataSeed;
 using E_Commerce.Presistence.Data.DbContexts;
 using ECommerce.API.Extensions;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace ECommerce.API
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -30,9 +31,9 @@ namespace ECommerce.API
 
             var app = builder.Build();
 
-            app.MigrateDataBase();
+          await  app.MigrateDataBaseAsync();
 
-            app.SeedData();
+           await  app.SeedDataAsync();
             
             #region Configure PipeLine [Middlewares]
             // Configure the HTTP request pipeline.
@@ -50,7 +51,8 @@ namespace ECommerce.API
             app.MapControllers(); 
             #endregion
 
-            app.Run();
+           await app.RunAsync();
         }
     }
 }
+ 
