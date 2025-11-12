@@ -33,7 +33,7 @@ namespace E_Commerce.Presistence.Data.DataSeed
 
                 if (!HasBrands)
                 {
-                   await SeedDataFromJson<ProductBrand,int>("brands.json",_dbContext.ProductBrands); // Save Local
+                   await SeedDataFromJson<ProductBrand,int>(FileName: "brands.json",_dbContext.ProductBrands); // Save Local
                 }
 
                 if (!HasTypes)
@@ -59,8 +59,10 @@ namespace E_Commerce.Presistence.Data.DataSeed
         private async Task SeedDataFromJson<T,TKey>(string FileName , DbSet<T> dbset) where T :BaseEntity<TKey>,new() 
         {
             //H:\Route C44\Back End\Eng Khalid Ahmed\ECommerce_Project\ECommerce\E_Commerce.Presistence\Data\DataSeed\JsonFiles\products.json
+
             // E_Commerce.Presistence\Data\DataSeed\JsonFiles\products.json
-            var FilePath = @"..\E_Commerce.Presistence\Data\DataSeed\JsonFiles"+FileName;
+            //types.json
+            var FilePath = @"..\E_Commerce.Presistence\Data\DataSeed\JsonFiles\" + FileName;
 
             if (!File.Exists(FilePath))
             {
