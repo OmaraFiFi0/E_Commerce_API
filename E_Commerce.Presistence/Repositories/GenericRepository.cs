@@ -42,5 +42,18 @@ namespace E_Commerce.Presistence.Repositories
             _dbContext.Set<TEntity>().Remove(entity);
         }
 
+        public async Task<IEnumerable<TEntity>> GetAllAsync(ISpecifications<TEntity, TKey> specifications)
+        {
+            var Query = SpecificationsEvaluator.CreateQuery(_dbContext.Set<TEntity>(),specifications);
+
+            return await Query.ToListAsync();
+        }
+
+        public async Task<TEntity?> GetByIdAsync(ISpecifications<TEntity, TKey> specifications)
+        {
+            var Query = SpecificationsEvaluator.CreateQuery(_dbContext.Set<TEntity>(),specifications);
+
+            return await Query.FirstOrDefaultAsync();
+        }
     }
 }

@@ -6,18 +6,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.WebRequestMethods;
 
 namespace E_Commerce.Services.MappingProfiles
 {
-    public class ProductProfile:Profile
+    internal class ProductProfile:Profile
     {
         public ProductProfile()
         {
             CreateMap<ProductBrand, BrandDTO>();
             CreateMap<Product, ProductDTO>()
-                .ForMember(dest=>dest.ProductBrand,opt=>opt.MapFrom(src=>src.ProductBrand.Name))
-                .ForMember(dest=>dest.ProductType,opt=>opt.MapFrom(src=>src.ProductType.Name));
-            CreateMap<ProductType,BrandDTO>();
+                .ForMember(dest => dest.ProductBrand, opt => opt.MapFrom(src => src.ProductBrand.Name))
+                .ForMember(dest => dest.ProductType, opt => opt.MapFrom(src => src.ProductType.Name))
+                .ForMember(dest=>dest.PictureUrl , opt=>opt.MapFrom<ProductPictureUrlResolver>());
+            CreateMap<ProductType, TypeDTO>();
         }
     }
 }
