@@ -11,10 +11,7 @@ namespace E_Commerce.Services.Specification.ProductSpecifications
     internal class ProductTypeAndBrandSpecifications:BaseSpecification<Product,int>
     {
         public ProductTypeAndBrandSpecifications(ProductQueryParams queryParams)
-            :base(P=>(!queryParams.brandId.HasValue||P.BrandId ==queryParams.brandId.Value)
-                  &&  (!queryParams.typeId.HasValue||P.TypeId==queryParams.typeId.Value)
-            &&(string.IsNullOrEmpty(queryParams.search)||P.Name.ToLower().Contains(queryParams.search.ToLower())) )
-
+            :base(ProductSpecificationHelper.GetCriteria(queryParams))
         {
             AddInclude(P => P.ProductBrand);
             AddInclude(P => P.ProductType);
@@ -37,6 +34,8 @@ namespace E_Commerce.Services.Specification.ProductSpecifications
                     AddOrderBy(p => p.Id);
                     break;
             }
+            
+            ApplyPaginated(queryParams.PageSize, queryParams.PageIndex);
         }
         public ProductTypeAndBrandSpecifications(int id):base(X=>X.Id == id) 
         {

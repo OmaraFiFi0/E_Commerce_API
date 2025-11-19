@@ -23,13 +23,13 @@ namespace E_Commerce.Presentation.Controllers
 
         [HttpGet]
         // GET:BaseUrl/api/Products
-        public async Task<ActionResult<IEnumerable<ProductDTO>>> GetAllProducts([FromQuery] ProductQueryParams queryParams)
+        public async Task<ActionResult<PaginatedResult<ProductDTO>>> GetAllProducts([FromQuery] ProductQueryParams queryParams)
         {
             var products = await _productService.GetAllProductAsync(queryParams);
             return Ok(products);
         }
             
-
+        
         [HttpGet("{id}")]
         // GET:BaseUrl/api/Products/5
         public async Task<ActionResult<ProductDTO>> GetProduct(int id)
