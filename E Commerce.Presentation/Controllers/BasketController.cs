@@ -11,7 +11,7 @@ namespace E_Commerce.Presentation.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class BasketController:ControllerBase 
+    public class BasketController:ApiBaseController 
     {
         private readonly IBasketService _basketService;
 
@@ -25,7 +25,7 @@ namespace E_Commerce.Presentation.Controllers
         public async Task<ActionResult<BasketDTO>> GetBasket (string basketId)
         {
             var basket = await _basketService.GetBasketAsync(basketId);
-            return Ok(basket);
+             return HandelResult<BasketDTO>(basket);
         }
 
         // POST:BaseURL/api/Basket

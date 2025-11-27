@@ -5,6 +5,7 @@ using E_Commerce.Services.Exceptions;
 using E_Commerce.Services.Specification.ProductSpecifications;
 using E_Commerce.Services_Abstraction;
 using E_Commerce.Shared;
+using E_Commerce.Shared.CommonResponse;
 using E_Commerce.Shared.DTOs.ProductDTOs;
 using System;
 using System.Collections.Generic;
@@ -39,7 +40,6 @@ namespace E_Commerce.Services
             var productWithCountSpec = new ProductWithCountSpecification(queryParams);
             var TotalCount = await Repo.CountAsync(productWithCountSpec);
             var DataToReturn =  _mapper.Map<IEnumerable<ProductDTO>>(Products);
-
             var CountOFReturnData = DataToReturn.Count();
 
             return new PaginatedResult<ProductDTO>(queryParams.PageIndex, CountOFReturnData ,TotalCount ,DataToReturn);
@@ -51,12 +51,12 @@ namespace E_Commerce.Services
             return _mapper.Map<IEnumerable<ProductType>,IEnumerable<TypeDTO>>(Types);
         }
 
-        public async Task<ProductDTO> GetProductByIdAsync(int id)
+        public async Task<Result<ProductDTO>> GetProductByIdAsync(int id)
         {
             var spec = new ProductTypeAndBrandSpecifications(id);
             var product =await _unitOfWork.GenericRepository<Product,int>().GetByIdAsync(spec);
             if (product is null)
-                throw new ProductNotFoundException(id);
+                return Error.NotFound("Product Is NotFound", $"Product With Id {id} NotFound");
             return _mapper.Map<ProductDTO>(product);
         }
     }
