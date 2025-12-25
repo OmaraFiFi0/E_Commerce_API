@@ -26,7 +26,7 @@ namespace E_Commerce.Shared.CommonResponse
 
         protected Result(List<Error> errors)
         {
-            _errors.AddRange(_errors);
+            _errors.AddRange(errors);
         }
 
         public static Result Ok() => new Result();
