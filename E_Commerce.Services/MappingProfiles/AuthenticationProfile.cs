@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using E_Commerce.Domain.Entities.IdentityModule;
-using E_Commerce.Shared.DTOs.AuthenticationDTOs;
+using E_Commerce.Shared.DTOs.OrderDTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,5 +1,6 @@
 ﻿using E_Commerce.Domain.Contracts;
 using E_Commerce.Domain.Entities;
+using E_Commerce.Domain.Entities.OrderModule;
 using E_Commerce.Domain.Entities.ProductModule;
 using E_Commerce.Presistence.Data.DbContexts;
 using Microsoft.EntityFrameworkCore;
@@ -28,8 +29,9 @@ namespace E_Commerce.Presistence.Data.DataSeed
                 var HasProduct = await _dbContext.Products.AnyAsync();
                 var HasBrands = await _dbContext.ProductBrands.AnyAsync();
                 var HasTypes = await _dbContext.ProductTypes.AnyAsync();
+                var HasDeliveryMethod = await _dbContext.Set<DeliveryMethod>().AnyAsync();
 
-                if (HasProduct && HasBrands && HasTypes) return;
+                if (HasProduct && HasBrands && HasTypes && HasDeliveryMethod) return;
 
                 if (!HasBrands)
                 {
@@ -46,7 +48,15 @@ namespace E_Commerce.Presistence.Data.DataSeed
                 {
                      await SeedDataFromJson<Product,int>("products.json",_dbContext.Products); // Save Local
                 }
+
+                if (!HasDeliveryMethod)
+                {
+                    await SeedDataFromJson<DeliveryMethod,int>("delivery.json",_dbContext.Set<DeliveryMethod>());
+                    // Save Local
+                }
+
                 await _dbContext.SaveChangesAsync(); // 2nd DataBase Hit
+
             }
             catch (Exception ex)
             {
