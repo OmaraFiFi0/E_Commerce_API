@@ -17,6 +17,7 @@ namespace E_Commerce.Shared.DTOs.OrderDTOs
 
         public string DeliveryMethod { get; init; }
 
+        public string PaymentIntentId { get; set; }
         public string Status { get; init; }
 
         public DateTimeOffset OrderDate { get; init; }

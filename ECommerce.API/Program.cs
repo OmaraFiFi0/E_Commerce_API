@@ -38,7 +38,14 @@ namespace ECommerce.API
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             //builder.Services.AddSwaggerGen(); 
+            builder.Services.AddCors(option =>
+            {
+                option.AddPolicy("DevelopmentPolicy", builder =>
+                {
+                    builder.AllowAnyHeader().AllowAnyOrigin().AllowAnyMethod();
+                });
 
+            });
             #region Swagger Enhancement
             //
             builder.Services.AddSwaggerGen(options =>
@@ -118,6 +125,7 @@ namespace ECommerce.API
                 };
             });
             builder.Services.AddScoped<IOrderService, OrderService>();
+            builder.Services.AddScoped<IPaymentService,PaymentService>();
             #endregion
 
 
@@ -166,6 +174,7 @@ namespace ECommerce.API
             }
             app.UseStaticFiles();
             app.UseHttpsRedirection();
+            app.UseCors("DevelopmentPolicy");
 
             app.UseAuthentication();
             app.UseAuthorization();

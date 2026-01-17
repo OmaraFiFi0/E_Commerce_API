@@ -95,8 +95,8 @@ namespace E_Commerce.Services
             if(User is null)
                 return Error.NotFound("User.NotFound ",  $"User With This Email : {email} Was Not Found");
             
-            if (User.Address is null ) 
-                return Error.NotFound("Address.NotFound ", $"Address For This User With This Email : {email} Was Not Found");
+     //      if (User.Address is null ) 
+     //          return Error.NotFound("Address.NotFound ", $"Address For This User With This Email : {email} Was Not Found");
 
             return _mapper.Map<AddressDTO>(User.Address);
         }
