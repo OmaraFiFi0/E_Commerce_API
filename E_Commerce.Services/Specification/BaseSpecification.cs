@@ -15,28 +15,55 @@ namespace E_Commerce.Services.Specification
         {
             Criteria = criteriaExp;
         }
-        
-        public ICollection<Expression<Func<TEntity, object>>> IncludeExpression { get; } = [];
 
+
+        #region Filteration
         public Expression<Func<TEntity, bool>> Criteria { get; }
 
-        public Expression<Func<TEntity, object>> OrderBy{ private set; get; }
+        #endregion
 
-        public Expression<Func<TEntity, object>> OrderByDesc { private set; get; }
 
-        protected void AddInclude(Expression<Func<TEntity,object>> Include)
+        #region InClude
+        public ICollection<Expression<Func<TEntity, object>>> IncludeExpression { get; } = [];
+        protected void AddInclude(Expression<Func<TEntity, object>> Include)
         {
             IncludeExpression.Add(Include);
         }
 
-        protected void AddOrderBy(Expression<Func<TEntity, object>>OrderByExp)
+        #endregion
+
+        #region Ordering
+        public Expression<Func<TEntity, object>> OrderBy { private set; get; }
+        public Expression<Func<TEntity, object>> OrderByDesc { private set; get; }
+
+        protected void AddOrderBy(Expression<Func<TEntity, object>> OrderByExp)
         {
             OrderBy = OrderByExp;
         }
-        protected void AddOrderDesc(Expression<Func<TEntity, object>>OrderByDescExp)
+        protected void AddOrderDesc(Expression<Func<TEntity, object>> OrderByDescExp)
         {
             OrderByDesc = OrderByDescExp;
         }
-        
+        #endregion
+
+        #region Pagination
+
+        public int Skip { private set; get; }
+
+        public int Take { private set; get; }
+
+        public bool IsPaginated { private set; get; }
+
+
+        protected void ApplyPaginated(int PageSize,int PageIndex)
+        {
+           IsPaginated = true;
+
+            Skip = (PageIndex-1)* PageSize;
+
+            Take = PageSize; 
+        }
+        #endregion
+
     }
 }
