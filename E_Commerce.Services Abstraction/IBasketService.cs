@@ -1,4 +1,5 @@
-﻿using E_Commerce.Shared.DTOs.BasketDTOs;
+﻿using E_Commerce.Shared.CommonResponse;
+using E_Commerce.Shared.DTOs.BasketDTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace E_Commerce.Services_Abstraction
     {
         Task<BasketDTO> CreateOrUpdateBasketAsync(BasketDTO CreateOrUpdateBasket);
 
-        Task<BasketDTO> GetBasketAsync(string basketId);
+        Task<Result<BasketDTO>> GetBasketAsync(string basketId);
 
         Task<bool> DeleteBasketAsync(string basketId);
     }

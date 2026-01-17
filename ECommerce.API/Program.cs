@@ -1,7 +1,10 @@
  
 using E_Commerce.Domain.Contracts;
+using E_Commerce.Domain.Entities.IdentityModule;
 using E_Commerce.Presistence.Data.DataSeed;
 using E_Commerce.Presistence.Data.DbContexts;
+using E_Commerce.Presistence.IdentityData.DataSeed;
+using E_Commerce.Presistence.IdentityData.DbContexts;
 using E_Commerce.Presistence.Repositories;
 using E_Commerce.Services;
 using E_Commerce.Services.MappingProfiles;
@@ -9,9 +12,13 @@ using E_Commerce.Services_Abstraction;
 using ECommerce.API.CustomMiddleware;
 using ECommerce.API.Extensions;
 using ECommerce.API.Factories;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using StackExchange.Redis;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace ECommerce.API
@@ -33,7 +40,8 @@ namespace ECommerce.API
             {
                 option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
-            builder.Services.AddScoped<IDataIntializer,Datainitialize>();
+            builder.Services.AddKeyedScoped<IDataIntializer,Datainitialize>("Default");
+            builder.Services.AddKeyedScoped<IDataIntializer,DataIdentityInitializer>("Identity");
             builder.Services.AddScoped<IUnitOfWork,UnitOfWork>();
             builder.Services.AddAutoMapper(typeof(ServiceAssemblyReference).Assembly);
             //builder.Services.AddAutoMapper(X => X.AddProfile<ProductProfile>());
@@ -51,14 +59,45 @@ namespace ECommerce.API
             {
                 options.InvalidModelStateResponseFactory = ApiResponseFactory.GenerateApiValidationResponse;
             });
+
+            builder.Services.AddDbContext<StoreIdentityDbContext>(option =>
+            {
+                option.UseSqlServer(builder.Configuration.GetConnectionString("IdentityConnection"));
+            });
+
+            builder.Services.AddIdentityCore<ApplicationUser>()
+                .AddRoles<IdentityRole>()
+                .AddEntityFrameworkStores<StoreIdentityDbContext>();
+            
+            builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+
+            }).AddJwtBearer(options =>
+            {
+                options.SaveToken = true;
+                options.TokenValidationParameters = new TokenValidationParameters()
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidIssuer = builder.Configuration["JWTOptions:issuer"],
+                    ValidAudience = builder.Configuration["JWTOptions:audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWTOptions:SecurityKey"]!))
+                };
+            });
             #endregion
 
 
             var app = builder.Build();
 
           await  app.MigrateDataBaseAsync();
+            await app.MigrateIdentityDataBaseAsync();
 
            await  app.SeedDataAsync();
+           await app.SeedIdentityDataAsync();
 
             #region Configure PipeLine [Middlewares]
             // Configure the HTTP request pipeline.
@@ -91,8 +130,8 @@ namespace ECommerce.API
             app.UseStaticFiles();
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseAuthorization();
-
 
             app.MapControllers(); 
             #endregion

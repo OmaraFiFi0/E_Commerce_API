@@ -1,5 +1,7 @@
-﻿using E_Commerce.Domain.Entities.ProductModule;
+﻿using E_Commerce.Domain.Entities.IdentityModule;
+using E_Commerce.Domain.Entities.ProductModule;
 using E_Commerce.Presistence.Data.Configuration;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -21,7 +23,6 @@ namespace E_Commerce.Presistence.Data.DbContexts
         {
             //modelBuilder.ApplyConfigurationsFromAssembly(typeof(ProductConfiguration).Assembly);
             // Use it IF The Configurations are in the differnet ASSEMBLY  With DbContext
-
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         }
         public DbSet<Product> Products { get; set; }
