@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using E_Commerce.Domain.Contracts;
 using E_Commerce.Domain.Entities.ProductModule;
+using E_Commerce.Services.Specification.ProductSpecifications;
 using E_Commerce.Services_Abstraction;
+using E_Commerce.Shared;
 using E_Commerce.Shared.DTOs.ProductDTOs;
 using System;
 using System.Collections.Generic;
@@ -28,9 +30,10 @@ namespace E_Commerce.Services
             return _mapper.Map<IEnumerable<ProductBrand>,IEnumerable<BrandDTO>>(Brands);
         }
 
-        public async Task<IEnumerable<ProductDTO>> GetAllProductAsync()
+        public async Task<IEnumerable<ProductDTO>> GetAllProductAsync(ProductQueryParams queryParams)
         {
-            var Products = await _unitOfWork.GenericRepository<Product,int>().GetAllAsync();
+            var Spec = new ProductTypeAndBrandSpecifications(queryParams);
+            var Products = await _unitOfWork.GenericRepository<Product,int>().GetAllAsync(Spec);
             return _mapper.Map<IEnumerable<ProductDTO>>(Products);
         }
 
@@ -42,7 +45,8 @@ namespace E_Commerce.Services
 
         public async Task<ProductDTO> GetProductByIdAsync(int id)
         {
-            var product =await _unitOfWork.GenericRepository<Product,int>().GetByIdAsync(id);
+            var spec = new ProductTypeAndBrandSpecifications(id);
+            var product =await _unitOfWork.GenericRepository<Product,int>().GetByIdAsync(spec);
             return _mapper.Map<ProductDTO>(product);
         }
     }
