@@ -3,6 +3,7 @@ using E_Commerce.Domain.Entities.IdentityModule;
 using E_Commerce.Services_Abstraction;
 using E_Commerce.Shared.CommonResponse;
 using E_Commerce.Shared.DTOs.AuthenticationDTOs;
+using E_Commerce.Shared.DTOs.OrderDTOs;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -94,6 +95,9 @@ namespace E_Commerce.Services
             if(User is null)
                 return Error.NotFound("User.NotFound ",  $"User With This Email : {email} Was Not Found");
             
+            if (User.Address is null ) 
+                return Error.NotFound("Address.NotFound ", $"Address For This User With This Email : {email} Was Not Found");
+
             return _mapper.Map<AddressDTO>(User.Address);
         }
 
@@ -108,14 +112,14 @@ namespace E_Commerce.Services
                 User.Address.FirstName = addressDTO.FirstName;
                 User.Address.LastName = addressDTO.LastName;
                 User.Address.Street = addressDTO.Street;
-                User.Address.City = addressDTO.City;
+                 User.Address.City = addressDTO.City;
                 User.Address.Country = addressDTO.Country;
             }
             else // Created
             {
-                User.Address = _mapper.Map<Address>(addressDTO);
+                User.Address = _mapper.Map<AddressDTO,Address>(addressDTO);
             }
-            await _userManager.UpdateAsync(User);
+             await _userManager.UpdateAsync(User); 
 
             return _mapper.Map<AddressDTO>(User.Address);
         }

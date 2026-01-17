@@ -1,4 +1,4 @@
- 
+
 using E_Commerce.Domain.Contracts;
 using E_Commerce.Domain.Entities.IdentityModule;
 using E_Commerce.Presistence.Data.DataSeed;
@@ -17,7 +17,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
+using Swashbuckle.AspNetCore.SwaggerUI;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -35,7 +37,34 @@ namespace ECommerce.API
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            //builder.Services.AddSwaggerGen(); 
+
+            #region Swagger Enhancement
+            //
+            builder.Services.AddSwaggerGen(options =>
+            {
+                options.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "ECommerceAPI",
+                    Version = "v1"
+                });
+
+                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Description = " JWT Authorization Header Using Bearer Schema.Example:\"Authorization:Bearer {Token}\"",
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer",
+                    In = ParameterLocation.Header,
+
+                });
+
+                options.OperationFilter<SwaggerAuthorizeCheckOperationFilter>();
+
+            });
+
+            #endregion
+
             builder.Services.AddDbContext<StoreDbContext>(option =>
             {
                 option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
@@ -88,12 +117,13 @@ namespace ECommerce.API
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWTOptions:SecurityKey"]!))
                 };
             });
+            builder.Services.AddScoped<IOrderService, OrderService>();
             #endregion
 
 
             var app = builder.Build();
 
-          await  app.MigrateDataBaseAsync();
+             await  app.MigrateDataBaseAsync();
             await app.MigrateIdentityDataBaseAsync();
 
            await  app.SeedDataAsync();
@@ -101,6 +131,7 @@ namespace ECommerce.API
 
             #region Configure PipeLine [Middlewares]
             // Configure the HTTP request pipeline.
+
             #region 1st Way To Make Custom Middleware
             //app.Use(async (context, next) =>
             //{
@@ -121,11 +152,17 @@ namespace ECommerce.API
             //    }
             //}); 
             #endregion
+
             app.UseMiddleware<ExceptionHandlerMiddleware>();
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
-                app.UseSwaggerUI();   
+                app.UseSwaggerUI(options =>
+                {
+                    options.DisplayRequestDuration();
+                    options.EnableFilter();
+                    //options.DocExpansion(DocExpansion.None);
+                });   
             }
             app.UseStaticFiles();
             app.UseHttpsRedirection();

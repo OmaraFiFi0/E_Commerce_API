@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -24,7 +25,7 @@ namespace E_Commerce.Presentation.Controllers
                 return HandleProplem(result.Errors);
         }
 
-
+        protected string GetEmailFromToken() => User.FindFirstValue(ClaimTypes.Email)!;
 
         protected ActionResult<TValue>HandelResult<TValue>(Result<TValue> result)
         {
