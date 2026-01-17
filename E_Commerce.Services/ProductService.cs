@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using E_Commerce.Domain.Contracts;
 using E_Commerce.Domain.Entities.ProductModule;
+using E_Commerce.Services.Exceptions;
 using E_Commerce.Services.Specification.ProductSpecifications;
 using E_Commerce.Services_Abstraction;
 using E_Commerce.Shared;
@@ -54,6 +55,8 @@ namespace E_Commerce.Services
         {
             var spec = new ProductTypeAndBrandSpecifications(id);
             var product =await _unitOfWork.GenericRepository<Product,int>().GetByIdAsync(spec);
+            if (product is null)
+                throw new ProductNotFoundException(id);
             return _mapper.Map<ProductDTO>(product);
         }
     }
