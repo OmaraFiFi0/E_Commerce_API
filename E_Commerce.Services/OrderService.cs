@@ -30,13 +30,16 @@ namespace E_Commerce.Services
         }
         public async Task<Result<OrderDataToReturnDTO>> CreateOrderAsync(OrderDTO orderDTO, string Email)
         {
-            var OrderAddress = _mapper.Map<AddressDTO,OrderAddress>(orderDTO.Address);
+            var OrderAddress = _mapper.Map<AddressDTO,OrderAddress>(orderDTO.ShipToAddress);
             
             var Basket = await _basketRepository.GetBasketAsync(orderDTO.BasketId);
             if (Basket is null)
                 return Error.NotFound("This Basket Was NotFound",
                     $"The Basket With Id{orderDTO.BasketId} Was NotFound");
-            
+
+            if (Basket.PaymentIntentID is null)
+                return Error.Validation("PaymentIntent.NotFound");
+
             List<OrderItem> OrderItems = new List<OrderItem>();
             
             foreach (var item in Basket.Items)
@@ -56,9 +59,18 @@ namespace E_Commerce.Services
 
             var SubTotal = OrderItems.Sum(X => X.Price * X.Quantity);
 
+    
+            var orderspec = new OrderWithPaymentItentIdSpecifications(Basket.PaymentIntentID);
+            var orderRepo = _unitOfWork.GenericRepository<Order, Guid>();
+            var OrderExistWithThisPaymentIntent = await orderRepo.GetByIdAsync(orderspec);
+            if (OrderExistWithThisPaymentIntent is not null)
+                orderRepo.Delete(OrderExistWithThisPaymentIntent);
+
+
             var Order = new Order()
             {
                 UserEmail = Email,
+                PaymentIntentId = Basket.PaymentIntentID,
                 Items = OrderItems,
                 Address = OrderAddress,
                 DeliveryMethod = deliveryMethod,

@@ -49,13 +49,15 @@ namespace E_Commerce.Presistence.Data.DataSeed
                      await SeedDataFromJson<Product,int>("products.json",_dbContext.Products); // Save Local
                 }
 
+                await _dbContext.SaveChangesAsync(); // 2nd DataBase Hit
+
+
                 if (!HasDeliveryMethod)
                 {
-                    await SeedDataFromJson<DeliveryMethod,int>("delivery.json",_dbContext.Set<DeliveryMethod>());
+                    await SeedDataFromJson<DeliveryMethod, int>("delivery.json", _dbContext.Set<DeliveryMethod>());
                     // Save Local
                 }
 
-                await _dbContext.SaveChangesAsync(); // 2nd DataBase Hit
 
             }
             catch (Exception ex)
